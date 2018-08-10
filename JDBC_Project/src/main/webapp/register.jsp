@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html lang="en">
 <head>
 	<!--
@@ -73,6 +74,7 @@
 						<fieldset>
 							<div class="input-prepend" title="Username" data-rel="tooltip">
 								<span class="add-on"><i class="icon-user"></i></span><input autofocus class="input-large span10" name="username" id="username" type="text" value="admin" />
+								<span id="errorName"></span>
 							</div>
 							<div class="clearfix"></div>
 
@@ -103,6 +105,7 @@
 
 	<!-- jQuery -->
 	<script src="js/jquery-1.7.2.min.js"></script>
+		<script src="js/common/register.js"></script>
 	<!-- jQuery UI -->
 	<script src="js/jquery-ui-1.8.21.custom.min.js"></script>
 	<!-- transition / effect library -->
@@ -170,7 +173,7 @@
 	<script src="js/jquery.history.js"></script>
 	<!-- application script for Charisma demo -->
 	<script src="js/charisma.js"></script>
-	
+
 		
 </body>
 </html>

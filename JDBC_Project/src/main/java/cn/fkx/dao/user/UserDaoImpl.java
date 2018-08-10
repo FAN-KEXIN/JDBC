@@ -3,8 +3,10 @@ package cn.fkx.dao.user;
 import cn.fkx.bean.Users;
 import cn.fkx.uilt.BaseDao;
 import cn.fkx.uilt.PageUtil;
+import cn.fkx.uilt.ResultSetUtil;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoImpl extends BaseDao implements UserDao{
@@ -43,5 +45,40 @@ public class UserDaoImpl extends BaseDao implements UserDao{
     @Override
     public List<Users> findAllByPage(PageUtil util, Object... params) {
         return null;
+    }
+
+    /**
+     * 验证用户名是否存在
+     */
+    @Override
+    public String validateName(String userName) {
+        String sql="SELECT upwd FROM news_users WHERE uname= ?";
+        rs=executeQuery(sql,userName);
+        //获取密码
+        String password=null;
+        try {
+            if (rs.next()){
+                try {
+                    password=rs.getString("upwd");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return password;
+    }
+
+    /**
+     * 登录
+     */
+    @Override
+    public Users login(String userName, String passwordInDB) {
+        String sql="SELECT uid AS user_id,uname AS userName,upwd AS password,utype AS userType,email FROM news_users WHERE uname=? AND upwd=?";
+        Object [] params={userName,passwordInDB};
+        rs=executeQuery(sql,params);
+        Users users= ResultSetUtil.eachOne(rs,Users.class);
+        return users;
     }
 }

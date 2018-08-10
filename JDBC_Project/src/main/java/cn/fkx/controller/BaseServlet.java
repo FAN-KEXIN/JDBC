@@ -72,9 +72,16 @@ public abstract class BaseServlet extends HttpServlet {
                 System.out.println("====>最终的跳转页面===》"+viewName);
                 req.getRequestDispatcher(viewName).forward(req,resp);
             }else{//返回值是json
-                //将返回值信息存储到
+                /*//将返回值信息存储到
+
                 req.getSession().setAttribute("UserInfo",result);
-                resp.sendRedirect("Main.jsp");
+                resp.sendRedirect("Main.jsp");*/
+                String resultJson= (String) JSON.toJSONString(result);
+                System.out.println(resultJson);
+                PrintWriter writer=resp.getWriter();
+                writer.write(resultJson);
+                writer.flush();
+                writer.close();
             }
         }
     }
