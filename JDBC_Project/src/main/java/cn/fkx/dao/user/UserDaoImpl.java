@@ -19,7 +19,9 @@ public class UserDaoImpl extends BaseDao implements UserDao{
 
     @Override
     public int deleteByCondition(Serializable id) {
-        return 0;
+        String sql="DELETE FROM news_users WHERE uid= ?";
+        int num= executeUpdate(sql,id);
+        return num;
     }
 
     @Override
@@ -37,16 +39,31 @@ public class UserDaoImpl extends BaseDao implements UserDao{
         return null;
     }
 
+    //查询总记录数
     @Override
     public int findRownum() {
-        return 0;
+        String sql="SELECT COUNT(uid) AS COUNT FROM news_users";
+        rs=executeQuery(sql);
+        int count=0;
+        try {
+            if (rs.next()){
+                count=rs.getInt("COUNT");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 
     @Override
     public List<Users> findAllByPage(PageUtil util, Object... params) {
-        return null;
+        String sql="SELECT uid as user_id,uname as userName,utype as userType ,email as email ,upwd as password  FROM  news_users LIMIT ?,?";
+        Object [] parms={(util.getPageIndex()-1)*util.getPageSize(),util.getPageSize()};
+        rs=executeQuery(sql,parms);
+        List<Users> list = ResultSetUtil.eachList(rs, Users.class);
+        System.out.println(list.size()+"-=-");
+        return list;
     }
-
     /**
      * 验证用户名是否存在
      */

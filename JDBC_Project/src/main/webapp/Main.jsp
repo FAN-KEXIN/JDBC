@@ -59,54 +59,40 @@
             <table class="table table-striped table-bordered bootstrap-datatable datatable">
                 <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Date registered</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>用户编号</th>
+                    <th>用户名</th>
+                    <th>用户邮箱</th>
+                    <th>用户类型</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>David R</td>
-                    <td class="center">2012/01/01</td>
-                    <td class="center">Member</td>
-                    <td class="center">
-                        <span class="label label-success">Active</span>
-                    </td>
-                    <td class="center">
-                        <a class="btn btn-success" href="AddTo.jsp">
-                            <i class="icon-zoom-in icon-white"></i>
-                            View
-                        </a>
-                        <a class="btn btn-info" href="#">
-                            <i class="icon-edit icon-white"></i>
-                            Edit
-                        </a>
-                        <a class="btn btn-danger" href="#">
-                            <i class="icon-trash icon-white"></i>
-                            Delete
-                        </a>
-                    </td>
-                </tr>
+                <tbody id="list-content">
                 </tbody>
             </table>
         </div>
     </div><!--/span-->
 </div><!--/row-->
+
+<%--引入自己的pagination--%>
+<div class="pagination" id="pagination"></div>
+
+<!--模态窗口-->
 <div class="modal hide fade" id="myModal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
-        <h3>Settings</h3>
+        <h3>温馨提示</h3>
     </div>
     <div class="modal-body">
-        <p>Here settings can be configured...</p>
+        <p>您是否确定删除</p>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Close</a>
-        <a href="#" class="btn btn-primary">Save changes</a>
+        <a href="#" class="btn" data-dismiss="modal">关闭</a>
+        <a  onclick="realDelete()" class="btn btn-primary">确认删除</a>
     </div>
+    <!--设置隐藏域，获取删除的id-->
+    <input type="hidden" id="deleteId">
 </div>
+
+
 <!-- jQuery -->
 <script src="js/jquery-1.7.2.min.js"></script>
 <!-- jQuery UI -->
@@ -143,7 +129,6 @@
 <script src='js/fullcalendar.min.js'></script>
 <!-- data table plugin -->
 <script src='js/jquery.dataTables.min.js'></script>
-
 <!-- chart libraries start -->
 <script src="js/excanvas.js"></script>
 <script src="js/jquery.flot.min.js"></script>
@@ -151,7 +136,6 @@
 <script src="js/jquery.flot.stack.js"></script>
 <script src="js/jquery.flot.resize.min.js"></script>
 <!-- chart libraries end -->
-
 <!-- select or dropdown enhancer -->
 <script src="js/jquery.chosen.min.js"></script>
 <!-- checkbox, radio, and file input styler -->
@@ -176,5 +160,66 @@
 <script src="js/jquery.history.js"></script>
 <!-- application script for Charisma demo -->
 <script src="js/charisma.js"></script>
+<%--引入分页插件--%>
+<script src="js/jquery.pagination.js"></script>
+
+<%--ajax分页操作--%>
+<script type="text/javascript">
+loadData(1);//加载数据
+    function loadData(pageIndex) {//初始化数据的Ajax操作
+        $.ajax({
+            url:"/home?methodName=findAllByPage",
+            type:"POST",
+            data:{"pageIndex":pageIndex},
+            success:function (data) {
+                //每次成功清除之前的数据
+                $("#list-content").html("");
+                var data=$.parseJSON(data);
+                alert(data)
+                //遍历数据
+                $.each(data.list,function (i,dom) {
+                    $("#list-content").append(" <tr>\n" +
+                        "  <td>"+dom.user_id+"</td>\n" +
+                        "                    <td class=\"center\">"+dom.userName+"</td>\n" +
+                        "                    <td class=\"center\">\n" +
+                        "                        <span class=\"label label-warning\">"+dom.email+"</span>\n" +
+                        "                    </td>\n" +
+                        "                    <td class=\"center\">\n" +
+                        "                        <span class=\"label label-warning\">"+dom.userType+"</span>\n" +
+                        "                    </td>\n" +
+                        "                    <td class=\"center\">\n" +
+                        "                        <a class=\"btn btn-danger\" onclick=\"showModal("+dom.user_id+");\">\n" +
+                        "                            <i class=\"icon-trash icon-white\"></i>\n" +
+                        "                            删除\n" +
+                        "                        </a>\n" +
+                        "                    </td>\n" +
+                        "                </tr>");
+                });//遍历结束
+                //使用分页插件
+                $("#pagination").pagination(data.totalCount,
+                    {
+                        current_page:data.pageIndex, //当前页面
+                        items_per_page:data.pageSize, //每页显示的条目数
+                        prev_text:"上一页",
+                        next_text:"下一页",
+                        callback:loadData //回调函数
+                    });
+            }//success回调函数
+        });
+    };
+    //模态窗口的操作
+    function  showModal(delId) {
+        //显示模态窗口
+        $("#myModal").modal("show");
+        //给隐藏域赋值
+        $("#deleteId").val(delId);
+    }
+    //真正删除
+    function realDelete() {
+
+        var id=$("#deleteId").val();
+        window.location.href="/home?methodName=deleteUser&id="+id;
+    }
+</script>
 </body>
 </html>
